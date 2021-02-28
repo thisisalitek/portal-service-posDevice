@@ -1,2 +1,3 @@
+@echo off
 title posDevice Service
-nodemon start-dev.js
+nodemon start.js -development

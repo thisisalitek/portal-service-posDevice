@@ -1,0 +1,16 @@
+{
+	"httpserver":{
+		"port" : 3700
+	},
+	"mongodb": {
+		"address":"mongodb://localhost:27017/local_masterdb",
+		"userAddress":"mongodb://localhost:27017/"
+	},
+	"connectorService":{
+		"url":"http://localhost:3800",
+		"enabled":true
+	},
+	"tmpDir11":"/tmp",
+	"tmpDir":"C:\\arge\\tr216\\temp",
+	"status":"release"
+}
