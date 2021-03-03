@@ -44,27 +44,29 @@ exports.getZReport=(serviceOptions,reqOptions,cb)=>{
 	
 	ingenicoWebService(serviceOptions.url,serviceOptions.username,serviceOptions.password,'/GetZReport',reqOptions,(err,resp)=>{
 		if(!err){
-			var index=0;
+			cb(err,resp)
+			// var index=0;
 
-			function detaylariIndir(callb){
-				eventLog(`${serviceOptions.name.cyan} detaylariIndir: ${index}/${resp.ZReportItems.length}`)
-				if(index>=resp.ZReportItems.length) return callb(null);
-				exports.getZReportSubParts(serviceOptions,reqOptions,resp.ZReportItems[index].ZNo,resp.ZReportItems[index].EkuNo,(err,subResult)=>{
-					if(!err){
-						resp.ZReportItems[index]['SubParts']=subResult;
-					}
-					index++;
-					setTimeout(detaylariIndir,2000,callb);
-				});
-			}
+			// function detaylariIndir(callb){
+			// 	eventLog(`${serviceOptions.name.cyan} detaylariIndir: ${index}/${resp.ZReportItems.length}`)
+			// 	if(index>=resp.ZReportItems.length)
+			// 		return callb(null)
+			// 	exports.getZReportSubParts(serviceOptions,reqOptions,resp.ZReportItems[index].ZNo,resp.ZReportItems[index].EkuNo,(err,subResult)=>{
+			// 		if(!err){
+			// 			resp.ZReportItems[index]['SubParts']=subResult;
+			// 		}
+			// 		index++;
+			// 		setTimeout(detaylariIndir,2000,callb);
+			// 	});
+			// }
 			
-			detaylariIndir((err)=>{
-				if(err){
-					errorLog('detaylariIndir',err);
-				}
+			// detaylariIndir((err)=>{
+			// 	if(err){
+			// 		errorLog('detaylariIndir',err);
+			// 	}
 				
-				cb(err,resp);
-			});
+			// 	cb(err,resp);
+			// });
 		}else{
 			errorLog('getZReport.ingenicoWebService',err);
 			cb(err,resp);
