@@ -1,36 +1,29 @@
-/* Pos Device Service | etulia/portal */
 var ingenico=require('./ingenico/ingenico.js')
-var repeatInterval=60000
 
 exports.start=()=>{
-	
-	function calistir(){
-		refreshRepoDb(()=>{
-			Object.keys(repoDb).forEach((_id)=>{
-				if(!repoDb[_id].working){
-					repoDb[_id].working=true
-					syncPosDeviceSync(repoDb[_id],()=>{
-						repoDb[_id].working=false
-					})
-				}else{
-					console.log(`${repoDb[_id].dbName.yellow} is working`)
-				}
-			})
-		})
-		setTimeout(calistir,repeatInterval)
-	}
-
-	calistir()
+	runServiceOnAllUserDb({
+		filter:(dbModel)=>{
+			if(dbModel.services.posDevice){
+				return true
+			}else{
+				return false
+			}
+		},
+		serviceFunc:(dbModel,cb)=>{
+			syncPosDeviceSync(dbModel,cb)
+		},
+		name:'posDevice',
+		repeatInterval:config.repeatInterval || 60000
+	})
 }
 
 
 function syncPosDeviceSync(dbModel,cb){
 	
-	eventLog(`syncPosDeviceSync on ${dbModel.dbName.yellow}`)
 	try{
 		checkDbAndDownload(dbModel,(err)=>{
 			if(err){
-				errorLog(`Error: syncPosDeviceSync db:${dbModel.dbName.yellow}`,err)
+				errorLog(`${dbModel.nameLog} Error: syncPosDeviceSync:`,err)
 			}
 			cb()
 		})
@@ -55,10 +48,11 @@ function checkDbAndDownload(dbModel,callback){
 				}else{
 					dbModel.pos_devices.find({service:serviceDocs[index]._id,passive:false},(err,posDeviceDocs)=>{
 						if(!err){
-							console.log(`checkDbAndDownload ${dbModel.dbName} index:${index}:`)
+							eventLog(`${dbModel.nameLog} Srvc:${serviceDocs[index].name.cyan}, deviceCount: ${posDeviceDocs.length.toString().yellow}`)
+							
 							downloadData(dbModel,serviceDocs[index],posDeviceDocs,(err)=>{
 								if(err){
-									errorLog(`(${dbModel.dbName.yellow}) ${serviceDocs[index].type.cyan} _id:${serviceDocs[index]._id.cyan}:`,err)
+									errorLog(`${dbModel.nameLog} Srvc:${serviceDocs[index].name.cyan} _id:${serviceDocs[index]._id.cyan}:`,err)
 								}
 								index++
 								setTimeout(runService,3000,cb)

@@ -8,8 +8,9 @@ var favicon = require('serve-favicon')
 
 var indexRouter = require('./routes/index')
 var dbLoader = require('./db/db-loader')
+var httpServer=require('./bin/http-server.js')
 
-var app = express()
+global.app = express()
 var cors = require('cors')
 app.use(cors())
 var flash = require('connect-flash')
@@ -27,15 +28,17 @@ app.set('name',require('./package').name)
 app.set('version',require('./package').version)
 app.set('port',config.httpserver.port)
 
-module.exports=(cb)=>{
-	dbLoader((err)=>{
-		if(!err){
-			global.posDevice=require('./services/pos-device/pos-device')
-			posDevice.start()
-			cb(null,app)
-		}else{
-			cb(err)
-		}
+module.exports=()=>{
+	httpServer(app,(err,server,port)=>{
+		dbLoader((err)=>{
+			if(!err){
+				refreshRepoDb()
+				global.posDevice=require('./services/pos-device/pos-device')
+				posDevice.start()
+			}else{
+				errorLog(err)
+			}
+		})
 	})
 }
 
@@ -43,12 +46,12 @@ module.exports=(cb)=>{
 process.on('uncaughtException', function (err) {
 	errorLog('Caught exception: ', err)
 	
-	mail.sendErrorMail(`Err ${config.status} ${app.get('name')}`,err,(mailErr,info)=>{
-		if(mailErr)
-			console.log(`mailErr:`,mailErr)
-		console.log(`mail info:`,info)
-		process.exit(0)
-	})
+	// mail.sendErrorMail(`Err ${config.status} ${app.get('name')}`,err,(mailErr,info)=>{
+	// 	if(mailErr)
+	// 		console.log(`mailErr:`,mailErr)
+	// 	console.log(`mail info:`,info)
+	// 	process.exit(0)
+	// })
 
 })
 
