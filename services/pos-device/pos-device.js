@@ -1,20 +1,45 @@
 var ingenico=require('./ingenico/ingenico.js')
 
+var calisanDatabaseler={}
+
 exports.start=()=>{
 	runServiceOnAllUserDb({
-		filter:(dbModel)=>{
-			if(dbModel.services.posDevice){
-				return true
-			}else{
-				return false
-			}
-		},
-		serviceFunc:(dbModel,cb)=>{
-			syncPosDeviceSync(dbModel,cb)
-		},
+		filter:{'services.posDevice':true},
+		serviceFunc:(dbModel,cb)=>{ syncPosDeviceSync(dbModel,cb) },
 		name:'posDevice',
 		repeatInterval:config.repeatInterval || 60000
 	})
+	// eventLog(`${'posDevice service'.green} started`)
+
+	// function calistir(){
+	// 	db.dbdefines.find({deleted:false,passive:false,'services.posDevice':true}).select('_id').exec((err,docs)=>{
+	// 		if(!err){
+	// 			eventLog(`${docs.length.toString().brightBlue} adet veri ambari uzerinde calisiyor`)
+	// 			docs.forEach((doc)=>{
+	// 				if(!calisanDatabaseler[doc._id]){
+	// 					calisanDatabaseler[doc._id]={	working:true}
+	// 					repoDbModel(doc._id,(err,dbModel)=>{
+	// 						if(!err){
+	// 							syncPosDeviceSync(dbModel,()=>{
+	// 								dbModel.free()
+	// 								delete dbModel
+	// 								delete calisanDatabaseler[doc._id]
+	// 							})
+	// 						}else{
+	// 							errorLog(`${'posDevice service'.green} error:`,err)
+	// 							delete calisanDatabaseler[doc._id]
+	// 						}
+	// 					})
+	// 				}
+	// 			})
+	// 			setTimeout(calistir,(config.repeatInterval || 60000))
+	// 		}else{
+	// 			errorLog(`${'posDevice service'.green} error:`,err)
+	// 			setTimeout(calistir,(config.repeatInterval || 60000))
+	// 		}
+	// 	})
+	// }
+	// calistir()
 }
 
 

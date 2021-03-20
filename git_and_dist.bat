@@ -1,5 +1,8 @@
 
-rem @echo off
+@echo off
+
+for %%a in ("%cd%") do set CurDir=%%~na
+
 
 git add *
 git status
@@ -9,7 +12,7 @@ if NOT "%aciklama%"=="" (git commit -m "%aciklama%" & git push)
 
 cd C:\arge\ganygo\_dist
 
-call :distHazirla "api"
+call :distHazirla %CurDir%
 
 
 exit 0

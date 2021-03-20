@@ -32,7 +32,6 @@ module.exports=()=>{
 	httpServer(app,(err,server,port)=>{
 		dbLoader((err)=>{
 			if(!err){
-				refreshRepoDb()
 				global.posDevice=require('./services/pos-device/pos-device')
 				posDevice.start()
 			}else{

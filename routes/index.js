@@ -37,11 +37,8 @@ module.exports=(app)=>{
 function clientControllers(app){
 	
 	app.all('/:dbId/*', (req, res, next)=>{
-		if(repoDb[req.params.dbId]==undefined){
-			next(`dbId:'${req.params.dbId}' bulunamadi`)
-		}else{
-			next()
-		}
+		next()
+		
 	})
 
 	app.all('/:dbId/:func', (req, res, next)=>{
@@ -61,15 +58,23 @@ function clientControllers(app){
 	function setRepoAPIFunctions(req,res,next){
 		passport(req,res,next,(member)=>{
 			var ctl=getController(req.params.func)
-			ctl(repoDb[req.params.dbId], req, res, next, (data)=>{
-				if(data==undefined)
-					res.json({success:true})
-				else if(data==null)
-                    res.json({success:true})
-                else if(data.file!=undefined)
-                    downloadFile(data.file,req,res)
-                else{
-					res.status(200).json({ success:true, data: data })
+			repoDbModel(req.params.dbId,(err,dbModel)=>{
+				if(!err){
+					ctl(dbModel, req, res, next, (data)=>{
+						if(data==undefined)
+							res.json({success:true})
+						else if(data==null)
+							res.json({success:true})
+						else if(data.file!=undefined)
+							downloadFile(data.file,req,res)
+						else{
+							res.status(200).json({ success:true, data: data })
+						}
+						dbModel.free()
+						delete dbModel
+					})
+				}else{
+					next(err)
 				}
 			})
 		})
