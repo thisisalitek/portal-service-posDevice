@@ -1,71 +1,77 @@
 var api=require('./api.js')
 
-
+const zRaporInterval=300
+const zRaporTimeoutWait=30000
 exports.download=(dbModel,serviceDoc,posDeviceDocs,callback)=>{
 	if(posDeviceDocs.length>0){
 		var index=0
 
 		function zRaporIndir(cb){
-			
 			if(index>=posDeviceDocs.length)
 				return cb(null)
-			eventLog(`${dbModel.nameLog} Srvc:${serviceDoc.name.cyan}, ${'zRaporIndir()'.yellow} ${posDeviceDocs[index].deviceSerialNo.green} ${(index+1).toString().green}/${posDeviceDocs.length.toString().yellow}`)
-			
-			if(posDeviceDocs[index].deviceSerialNo!=''){
+
+			if((posDeviceDocs[index].deviceSerialNo || '')!=''){
+				eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, ${'zRaporIndir()'.yellow} ${posDeviceDocs[index].deviceSerialNo.green} ${(index+1).toString().green}/${posDeviceDocs.length.toString().yellow}`)
 				generateReqOption(dbModel,posDeviceDocs[index],(err,reqOpt)=>{
 					if(!err){
 						api.getZReport(serviceDoc,reqOpt,(err,resp)=>{
 							if(!err){
-								// eventLog(`${dbModel.dbName.yellow} resp.ZReportItems.length:`,resp.ZReportItems.length.toString())
-								
 								insertZReports(dbModel,posDeviceDocs[index],resp.ZReportItems,(err)=>{
-									if(!err){
-										index++
-										
-										setTimeout(zRaporIndir,1000,cb)
-									}else{
-										
-										//errorLog(`${dbModel.dbName.yellow} insertZReports Error:` ,err)
-										index++
-										setTimeout(zRaporIndir,1000,cb)
+									if(err){
+										errorLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, api.getZReport ERROR: ${(posDeviceDocs[index].deviceSerialNo || '').yellow}`,err)
 									}
+									index++
+									setTimeout(zRaporIndir,zRaporInterval,cb)
 								})
 							}else{
-								
+
 								errorLog(`${dbModel.dbName.yellow} download getZReport Error:` , err)
-								if(err.errno!=undefined){
-									if(err.errno=='ETIMEDOUT'){
-										
-										eventLog(`${dbModel.nameLog} Srvc:${serviceDoc.name.cyan}, TIMEOUT ${posDeviceDocs[index].deviceSerialNo.yellow} 30sn sonra yeniden.`)
-										setTimeout(zRaporIndir,30000,cb)
+								if(err.code!=undefined){
+									if(err.code=='ETIMEDOUT'){
+
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										eventLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, TIMEOUT ${(posDeviceDocs[index].deviceSerialNo || '').yellow} ${zRaporTimeoutWait/1000}sn sonra yeniden.`)
+										setTimeout(zRaporIndir,zRaporTimeoutWait,cb)
 									}else{
 										index++
-										errorLog(`${dbModel.nameLog} Srvc:${serviceDoc.name.cyan}, api.getZReport ERROR: ${posDeviceDocs[index].deviceSerialNo.yellow}\r\n`,err)
-										setTimeout(zRaporIndir,1000,cb)
+										errorLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, api.getZReport ERROR: ${(posDeviceDocs[index].deviceSerialNo || '').yellow}`,err)
+										setTimeout(zRaporIndir,zRaporInterval,cb)
 									}
 								}else{
 									index++
-									errorLog(`${dbModel.nameLog} Srvc:${serviceDoc.name.cyan}, api.getZReport ERROR: ${posDeviceDocs[index].deviceSerialNo.yellow}\r\n`,err)
-									setTimeout(zRaporIndir,1000,cb)
+									errorLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, api.getZReport ERROR: ${(posDeviceDocs[index].deviceSerialNo || '').yellow}`,err)
+									setTimeout(zRaporIndir,zRaporInterval,cb)
 								}
-								
+
 							}
 						})
 					}else{
 						index++
-						errorLog(`${dbModel.nameLog} Srvc:${serviceDoc.name.cyan}, generateReqOption() ERROR: ${posDeviceDocs[index].deviceSerialNo.yellow}\r\n`,err)
-						setTimeout(zRaporIndir,1000,cb)
+						errorLog(`${dbModel.nameLog} ${serviceDoc.name.cyan}, generateReqOption() ERROR: ${(posDeviceDocs[index].deviceSerialNo || '').yellow}`,err)
+						setTimeout(zRaporIndir,zRaporInterval,cb)
 					}
 				})
 			}else{
 				index++
-				setTimeout(zRaporIndir,1000,cb)
+				setTimeout(zRaporIndir,zRaporInterval,cb)
 			}
 		}
 
 		zRaporIndir((err)=>{
 			if(err){
-				errorLog(`${dbModel.nameLog} Srvc:${serviceDoc.name.cyan}, download ERROR:\r\n`,err)
+				errorLog(`${dbModel.nameLog} Srvc:${serviceDoc.name.cyan}, download ERROR:`,err)
 			}
 			callback(err)
 		})
@@ -93,7 +99,7 @@ function insertZReports(dbModel,posDeviceDoc,ZReportItems,callback){
 					setTimeout(dahaOncedenKaydedilmisMi,0,cb)
 				}
 			}else{
-				errorLog(`${dbModel.nameLog} insertZReports deviceSerialNo: ${posDeviceDoc.deviceSerialNo.yellow} ERROR:\r\n`,err)
+				errorLog(`${dbModel.nameLog} insertZReports deviceSerialNo: ${posDeviceDoc.deviceSerialNo.yellow} ERROR:`,err)
 				cb(err)
 			}
 		})
@@ -101,7 +107,6 @@ function insertZReports(dbModel,posDeviceDoc,ZReportItems,callback){
 	
 	dahaOncedenKaydedilmisMi((err)=>{
 		if(!err){
-			// eventLog(`${dbModel.dbName.yellow} insertZReports ZReportItems.length:`,ZReportItems.length.toString())
 			if(ZReportItems.length==0) return callback(null)
 				var data=[]
 			ZReportItems.forEach((e)=>{
@@ -111,7 +116,6 @@ function insertZReports(dbModel,posDeviceDoc,ZReportItems,callback){
 				data.push({posDevice:posDeviceDoc._id,data:e,zNo:e.ZNo,zDate:d,zTotal:e.GunlukToplamTutar})
 
 			})
-			// eventLog('insertZReports beforeSort  data.length:',data.length.toString())
 			data.sort(function(a,b){
 				if(a.zDate>b.zDate) 
 					return 1
@@ -120,16 +124,14 @@ function insertZReports(dbModel,posDeviceDoc,ZReportItems,callback){
 				return 0
 			})
 
-			// eventLog('insertZReports  data.length:',data.length.toString())
-
 			dbModel.pos_device_zreports.insertMany(data,{ordered:true},(err,docs)=>{
 				if(err){
-					errorLog(`${dbModel.nameLog} dahaOncedenKaydedilmisMi deviceSerialNo: ${posDeviceDoc.deviceSerialNo.yellow} ERROR:\r\n`,err)
+					errorLog(`${dbModel.nameLog} dahaOncedenKaydedilmisMi deviceSerialNo: ${posDeviceDoc.deviceSerialNo.yellow} ERROR:`,err)
 				}
 				callback(err)
 			})
 		}else{
-			errorLog(`${dbModel.nameLog} dahaOncedenKaydedilmisMi deviceSerialNo: ${posDeviceDoc.deviceSerialNo.yellow} ERROR:\r\n`,err)
+			errorLog(`${dbModel.nameLog} dahaOncedenKaydedilmisMi deviceSerialNo: ${posDeviceDoc.deviceSerialNo.yellow} ERROR:`,err)
 			callback(err)
 		}
 	})
@@ -137,6 +139,9 @@ function insertZReports(dbModel,posDeviceDoc,ZReportItems,callback){
 
 
 function generateReqOption(dbModel,posDeviceDoc,cb){
+	if((posDeviceDoc.deviceSerialNo || '')==''){
+		return cb({code:'WRONG_VALUE',message:'Pos Cihaz serino hatalı'})
+	}
 	dbModel.pos_device_zreports.find({posDevice:posDeviceDoc._id}).sort({zDate:-1}).limit(1).exec((err,docs)=>{
 		if(!err){
 			var reqOptions={
